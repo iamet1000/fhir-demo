@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>新增病人</title>
+</head>
+<body>
+    <h1>新增病人</h1>
+    <form id="createPatientForm">
+        <label for="name">姓名:</label>
+        <input type="text" id="name" name="name" required><br><br>
+
+        <label for="gender">性別:</label>
+        <select id="gender" name="gender" required>
+            <option value="male">男</option>
+            <option value="female">女</option>
+            <option value="other">其他</option>
+        </select><br><br>
+
+        <label for="birthDate">生日:</label>
+        <input type="date" id="birthDate" name="birthDate" required><br><br>
+
+        <label for="identifier">身份識別碼:</label>
+        <input type="text" id="identifier" name="identifier" required><br><br>
+
+        <button type="submit">新增病人</button>
+    </form>
+
+    <h2 id="responseTitle" style="display:none;">回應</h2>
+    <pre id="response"></pre>
+
+    <script>
+        document.getElementById('createPatientForm').addEventListener('submit', async function (event) {
+            event.preventDefault();
+
+            const patientData = {
+                resourceType: 'Patient',
+                name: [{ text: document.getElementById('name').value }],
+                gender: document.getElementById('gender').value,
+                birthDate: document.getElementById('birthDate').value,
+                identifier: [{ value: document.getElementById('identifier').value }]
+            };
+
+            try {
+                const response = await fetch('https://hapi.fhir.tw/fhir/Patient', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(patientData)
+                });
+
+                const patientResponse = await response.json();
+                document.getElementById('response').textContent = JSON.stringify(patientResponse, null, 2);
+                document.getElementById('responseTitle').style.display = 'block';
+
+                if (confirm('已新增成功。是否返回到運動處方頁面？')) {
+                    localStorage.setItem('patientId', patientResponse.id);
+                    localStorage.setItem('patientName', patientResponse.name[0].text);
+                    window.location.href = 'CreateExercisePrescription.html';
+                }
+            } catch (error) {
+                document.getElementById('response').textContent = `Error: ${error.message}`;
+                document.getElementById('responseTitle').style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>
