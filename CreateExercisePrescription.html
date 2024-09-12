@@ -61,6 +61,15 @@
             <label for="safetyNotes">安全注意事項 (禁忌動作):</label>
             <input type="text" id="safetyNotes" name="safetyNotes" required>
 
+            <!-- 新增的 Priority 欄位 -->
+            <label for="priority">優先級:</label>
+            <select id="priority" name="priority" required>
+                <option value="routine">常規 (Routine)</option>
+                <option value="urgent">緊急 (Urgent)</option>
+                <option value="asap">盡快 (ASAP)</option>
+                <option value="stat">立即 (Stat)</option>
+            </select>
+
             <button type="button" id="createServiceRequestBtn">創建運動處方</button>
         </form>
 
@@ -117,18 +126,18 @@
                             resourceType: "ServiceRequest",
                             status: "active",
                             intent: "order",
+                            priority: formData.get('priority'), // 設定優先級
                             category: [{
                                 coding: [{
-                                    system: "http://terminology.hl7.org/CodeSystem/service-category",
-                                    code: "229065009"
-                                }],
-                                text: "Exercise prescription"
+                                    system: "http://hl7.org/fhir/us/physical-activity/CodeSystem/pa-temporary-codes",
+                                    code: "PhysicalActivity"
+                                }]
                             }],
                             code: {
                                 coding: [{
-                                    system: "http://loinc.org",
-                                    code: formData.get('exerciseType'),
-                                    display: document.querySelector(`#exerciseType option[value="${formData.get('exerciseType')}"]`).textContent
+                                    system: "http://snomed.info/sct",
+                                    code: "229065009",
+                                    display: "Exercise therapy (regime/therapy)"
                                 }],
                                 text: "Exercise prescription"
                             },
